@@ -948,6 +948,9 @@ export default function HomePage() {
 
         {/* PWA Install Prompt */}
         <PWAInstaller />
+        
+        {/* Manual Install Button for Firefox and other browsers */}
+        <InstallAppButton />
       </div>
     </div>
   );

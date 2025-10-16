@@ -1,5 +1,25 @@
 # Flipco Capital Website - 🎉 DEPLOYED TO NETLIFY!
 
+## ✅ **VERSION 197 - FIREFOX PWA SUPPORT ADDED**
+
+### **🚀 PWA Installation Now Works On All Browsers:**
+- ✅ **Chrome Desktop & Mobile** - Automatic install prompt + manual instructions
+- ✅ **Firefox Desktop & Mobile** - Manual install with browser-specific instructions
+- ✅ **iOS Safari** - Step-by-step home screen installation guide
+- ✅ **Android** - Native install prompt with fallback instructions
+
+### **✅ What's New in v197:**
+- ✅ Firefox browser detection and specific install instructions
+- ✅ Chrome desktop install instructions added
+- ✅ InstallAppButton component integrated on homepage
+- ✅ Fixed manifest.json icon paths (.svg instead of .png.svg)
+- ✅ Multi-browser PWA support complete
+
+### **🔧 Technical Details:**
+- **PWAInstaller** - Handles Chrome/Edge automatic prompts
+- **InstallAppButton** - Shows manual instructions for Firefox, iOS, and as fallback
+- Both components work together for comprehensive browser coverage
+
 ## ✅ **DEPLOYMENT COMPLETE - VERSION 194**
 
 ### **🚀 LIVE SITE:**

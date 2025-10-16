@@ -9,7 +9,8 @@ export default function InstallAppButton() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
-  const [platform, setPlatform] = useState<'ios' | 'android' | 'other'>('other');
+  const [platform, setPlatform] = useState<'ios' | 'android' | 'firefox' | 'chrome' | 'other'>('other');
+  const [showButton, setShowButton] = useState(false);
 
   useEffect(() => {
     // Check if app is already installed
@@ -18,20 +19,32 @@ export default function InstallAppButton() {
                                   (window.navigator as { standalone?: boolean }).standalone === true;
     setIsInstalled(isDisplayModeStandalone || isNavigatorStandalone);
 
-    // Detect device type
+    // Detect device type and browser
     const userAgent = navigator.userAgent.toLowerCase();
     const mobile = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+    const isFirefox = /firefox/i.test(userAgent);
+    const isChrome = /chrome/i.test(userAgent) && !/edg/i.test(userAgent);
+
     setIsMobile(mobile);
 
+    // Determine platform for showing appropriate instructions
     if (/iphone|ipad|ipod/i.test(userAgent)) {
       setPlatform('ios');
+      setShowButton(true);
     } else if (/android/i.test(userAgent)) {
       setPlatform('android');
+      setShowButton(true);
+    } else if (isFirefox) {
+      setPlatform('firefox');
+      setShowButton(true); // Show for Firefox desktop/mobile
+    } else if (isChrome) {
+      setPlatform('chrome');
+      setShowButton(true); // Show for Chrome desktop
     }
   }, []);
 
-  if (isInstalled || !isMobile) {
-    return null; // Don't show if already installed or not on mobile
+  if (isInstalled || !showButton) {
+    return null; // Don't show if already installed or browser not supported
   }
 
   return (
@@ -126,6 +139,68 @@ export default function InstallAppButton() {
                   <div className="bg-blue-50 p-3 rounded-lg mt-4">
                     <p className="text-xs text-blue-800">
                       💡 <strong>Tip:</strong> You may see an automatic install banner appear - just tap "Install" on it!
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {platform === 'firefox' && (
+                <div className="space-y-3">
+                  <p className="font-semibold text-slate-900">For Firefox:</p>
+                  <ol className="space-y-2 text-sm text-slate-700">
+                    <li className="flex gap-2">
+                      <span className="font-bold text-blue-600">1.</span>
+                      <span>Look for the <strong>install icon</strong> (house with a plus sign) in the address bar</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="font-bold text-blue-600">2.</span>
+                      <span>Click the <strong>install icon</strong> or right-click on the page</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="font-bold text-blue-600">3.</span>
+                      <span>Select <strong>"Install Flipco Capital"</strong> from the menu</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="font-bold text-blue-600">4.</span>
+                      <span>Click <strong>"Install"</strong> in the confirmation dialog</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="font-bold text-blue-600">5.</span>
+                      <span>The app will open in its own window!</span>
+                    </li>
+                  </ol>
+                  <div className="bg-blue-50 p-3 rounded-lg mt-4">
+                    <p className="text-xs text-blue-800">
+                      💡 <strong>Tip:</strong> On Firefox Android, tap the menu (three dots) → "Install" to add to home screen.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {platform === 'chrome' && (
+                <div className="space-y-3">
+                  <p className="font-semibold text-slate-900">For Chrome:</p>
+                  <ol className="space-y-2 text-sm text-slate-700">
+                    <li className="flex gap-2">
+                      <span className="font-bold text-blue-600">1.</span>
+                      <span>Look for the <strong>install icon</strong> (computer with arrow) in the address bar</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="font-bold text-blue-600">2.</span>
+                      <span>Click the <strong>install icon</strong></span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="font-bold text-blue-600">3.</span>
+                      <span>Click <strong>"Install"</strong> in the popup</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="font-bold text-blue-600">4.</span>
+                      <span>The app will open in its own window!</span>
+                    </li>
+                  </ol>
+                  <div className="bg-blue-50 p-3 rounded-lg mt-4">
+                    <p className="text-xs text-blue-800">
+                      💡 <strong>Tip:</strong> You may also see an automatic install banner at the bottom - just click "Install"!
                     </p>
                   </div>
                 </div>

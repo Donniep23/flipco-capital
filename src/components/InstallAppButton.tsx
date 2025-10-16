@@ -13,9 +13,10 @@ export default function InstallAppButton() {
 
   useEffect(() => {
     // Check if app is already installed
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                         (('standalone' in window.navigator && (window.navigator as { standalone?: boolean }).standalone) || false);
-    setIsInstalled(isStandalone);
+    const isDisplayModeStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isNavigatorStandalone = 'standalone' in window.navigator &&
+                                  (window.navigator as { standalone?: boolean }).standalone === true;
+    setIsInstalled(isDisplayModeStandalone || isNavigatorStandalone);
 
     // Detect device type
     const userAgent = navigator.userAgent.toLowerCase();

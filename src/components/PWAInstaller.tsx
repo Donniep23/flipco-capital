@@ -30,14 +30,19 @@ export default function PWAInstaller() {
     // Listen for install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
+      console.log('PWA: Install prompt event fired!');
       setDeferredPrompt(e as BeforeInstallPromptEvent);
 
-      // Show install prompt after a delay (don't be too aggressive)
+      // Show install prompt after a delay
+      // Shorter delay on mobile for better visibility
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const delay = isMobile ? 3000 : 10000; // 3 seconds on mobile, 10 on desktop
+
       setTimeout(() => {
         if (!isStandalone) {
           setShowInstallPrompt(true);
         }
-      }, 10000); // Show after 10 seconds
+      }, delay);
     };
 
     // Listen for app installed event
@@ -180,8 +185,8 @@ export default function PWAInstaller() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      <Card className="w-80 shadow-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50">
+      <Card className="w-full sm:w-80 shadow-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
         <CardHeader className="pb-4">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">

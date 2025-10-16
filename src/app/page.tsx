@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import DemoVideoModal from "@/components/DemoVideoModal";
 import PWAInstaller from "@/components/PWAInstaller";
+import InstallAppButton from "@/components/InstallAppButton";
 import { Phone, Mail, PlayCircle, TrendingUp, Shield, Eye, Users, Home, DollarSign, BarChart3, Menu, X } from "lucide-react";
 
 

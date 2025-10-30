@@ -18,8 +18,24 @@ import {
   Phone
 } from "lucide-react";
 
+interface TeamMember {
+  name: string;
+  title: string;
+  image: string;
+  bio: string;
+  experience: string;
+  specialties: string[];
+  linkedin: string;
+  email: string;
+}
+
 export default function AboutPage() {
-  const [teamMembers, setTeamMembers] = useState([
+  // Start empty to avoid hydration mismatch - will load from localStorage
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Fallback defaults if localStorage is empty
+  const defaultTeamMembers = [
     {
       name: "Cameron Namazi",
       title: "Founder & CEO",
@@ -70,6 +86,16 @@ export default function AboutPage() {
       linkedin: "#",
       email: "email@flipcocapital.com"
     },
+    {
+      name: "Soora Javadian",
+      title: "Chief Architect",
+      image: "https://ugc.same-assets.com/XcSQ4lhUnwXoan66_eBFbAWtOwRYJGQn.jpeg",
+      bio: "Experienced architect specializing in residential and commercial design with a focus on innovative and functional spaces.",
+      experience: "15+ Years",
+      specialties: ["Architectural Design", "Project Planning", "Construction Oversight"],
+      linkedin: "#",
+      email: "soora@flipcocapital.com"
+    },
     // Additional team member slots (hidden until filled)
     {
       name: "",
@@ -90,25 +116,22 @@ export default function AboutPage() {
       specialties: [],
       linkedin: "",
       email: ""
-    },
-    {
-      name: "",
-      title: "",
-      image: "",
-      bio: "",
-      experience: "",
-      specialties: [],
-      linkedin: "",
-      email: ""
     }
-  ]);
+  ];
 
-  // Load team members from localStorage
+  // Load team members from localStorage on client side only
   useEffect(() => {
     const savedTeam = localStorage.getItem("flipco_team_members");
     if (savedTeam) {
+      console.log("✅ Loading team members from localStorage");
       setTeamMembers(JSON.parse(savedTeam));
+    } else {
+      console.log("📝 No localStorage data, using defaults");
+      setTeamMembers(defaultTeamMembers);
+      // Save defaults to localStorage so admin panel can edit them
+      localStorage.setItem("flipco_team_members", JSON.stringify(defaultTeamMembers));
     }
+    setIsLoaded(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -278,7 +301,16 @@ export default function AboutPage() {
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {visibleTeamMembers.map((member, index) => (
+            {!isLoaded ? (
+              <div className="col-span-full text-center py-12 text-slate-500">
+                Loading team members...
+              </div>
+            ) : visibleTeamMembers.length === 0 ? (
+              <div className="col-span-full text-center py-12 text-slate-500">
+                No team members available
+              </div>
+            ) : (
+              visibleTeamMembers.map((member, index) => (
               <Card key={index} className="overflow-hidden">
                 <div className="aspect-square">
                   <img
@@ -298,7 +330,7 @@ export default function AboutPage() {
                   <div>
                     <p className="text-sm font-medium text-slate-900 mb-2">Specialties:</p>
                     <div className="flex flex-wrap gap-1">
-                      {member.specialties.map((specialty, idx) => (
+                      {member.specialties.map((specialty: string, idx: number) => (
                         <Badge key={idx} variant="outline" className="text-xs">
                           {specialty}
                         </Badge>
@@ -318,7 +350,8 @@ export default function AboutPage() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              ))
+            )}
           </div>
         </section>
 

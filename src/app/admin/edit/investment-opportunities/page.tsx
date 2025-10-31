@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
+import ImageUploader from "@/components/ImageUploader";
 import {
   ArrowLeft,
   Save,
@@ -354,15 +355,13 @@ export default function InvestmentOpportunitiesEditor() {
                         </Select>
                       </div>
                       <div>
-                        <Label htmlFor="image">Image URL</Label>
-                        <Input
-                          id="image"
-                          value={selectedOpportunity.image}
-                          onChange={(e) => setSelectedOpportunity({
+                        <ImageUploader
+                          label="Property Image (Drag & Drop or Click)"
+                          currentImage={selectedOpportunity.image}
+                          onImageUpload={(base64) => setSelectedOpportunity({
                             ...selectedOpportunity,
-                            image: e.target.value
+                            image: base64
                           })}
-                          placeholder="https://..."
                         />
                       </div>
                       <div>

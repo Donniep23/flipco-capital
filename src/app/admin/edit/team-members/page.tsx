@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import ImageUploader from "@/components/ImageUploader";
 import {
   ArrowLeft,
   Save,
@@ -353,22 +354,11 @@ export default function TeamMembersEditor() {
                 </div>
 
                 <div>
-                  <Label htmlFor="image">Profile Image URL</Label>
-                  <Input
-                    id="image"
-                    value={currentMember.image}
-                    onChange={(e) => handleUpdateMember("image", e.target.value)}
-                    placeholder="https://example.com/image.jpg"
+                  <ImageUploader
+                    label="Profile Image (Drag & Drop or Click)"
+                    currentImage={currentMember.image}
+                    onImageUpload={(base64) => handleUpdateMember("image", base64)}
                   />
-                  {currentMember.image && (
-                    <div className="mt-2">
-                      <img
-                        src={currentMember.image}
-                        alt="Preview"
-                        className="w-32 h-32 object-cover rounded-lg"
-                      />
-                    </div>
-                  )}
                 </div>
 
                 <div>

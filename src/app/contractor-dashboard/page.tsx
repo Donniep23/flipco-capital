@@ -515,92 +515,94 @@ export default function ContractorDashboardPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* Project Overview */}
             {currentProject ? (
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>{currentProject.name}</CardTitle>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">
-                      <Camera className="h-4 w-4 mr-2" />
-                      Upload Photos
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Chat
-                    </Button>
-                  </div>
-                </div>
-                <CardDescription className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  {currentProject.address}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-3 gap-6 mb-6">
-                  <div>
-                    <p className="text-sm font-medium text-slate-600">Budget</p>
-                    <p className="text-xl font-bold text-slate-900">${currentProject.budget.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-600">Spent</p>
-                    <p className="text-xl font-bold text-slate-900">${currentProject.spent.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-600">Deadline</p>
-                    <p className="text-xl font-bold text-slate-900">{new Date(currentProject.deadline).toLocaleDateString()}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
+            <>
+              <Card>
+                <CardHeader>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-slate-600">Project Progress</span>
-                    <span className="text-sm font-bold text-slate-900">{currentProject.progress}%</span>
+                    <CardTitle>{currentProject.name}</CardTitle>
+                    <div className="flex space-x-2">
+                      <Button variant="outline" size="sm">
+                        <Camera className="h-4 w-4 mr-2" />
+                        Upload Photos
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Chat
+                      </Button>
+                    </div>
                   </div>
-                  <Progress value={currentProject.progress} className="h-3" />
-                </div>
-              </CardContent>
-            </Card>
+                  <CardDescription className="flex items-center">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    {currentProject.address}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-3 gap-6 mb-6">
+                    <div>
+                      <p className="text-sm font-medium text-slate-600">Budget</p>
+                      <p className="text-xl font-bold text-slate-900">${currentProject.budget.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-slate-600">Spent</p>
+                      <p className="text-xl font-bold text-slate-900">${currentProject.spent.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-slate-600">Deadline</p>
+                      <p className="text-xl font-bold text-slate-900">{new Date(currentProject.deadline).toLocaleDateString()}</p>
+                    </div>
+                  </div>
 
-            {/* Task List */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  Tasks & Milestones
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {currentProject.tasks.map((task) => (
-                    <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        {task.status === "completed" ? (
-                          <CheckCircle className="h-5 w-5 text-green-600" />
-                        ) : task.status === "in-progress" ? (
-                          <Clock className="h-5 w-5 text-blue-600" />
-                        ) : (
-                          <AlertCircle className="h-5 w-5 text-yellow-600" />
-                        )}
-                        <div>
-                          <p className="font-medium text-slate-900">{task.title}</p>
-                          <p className="text-sm text-slate-600">Due: {new Date(task.dueDate).toLocaleDateString()}</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-slate-600">Project Progress</span>
+                      <span className="text-sm font-bold text-slate-900">{currentProject.progress}%</span>
+                    </div>
+                    <Progress value={currentProject.progress} className="h-3" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Task List */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <CheckCircle className="h-5 w-5 mr-2" />
+                    Tasks & Milestones
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {currentProject.tasks.map((task) => (
+                      <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          {task.status === "completed" ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : task.status === "in-progress" ? (
+                            <Clock className="h-5 w-5 text-blue-600" />
+                          ) : (
+                            <AlertCircle className="h-5 w-5 text-yellow-600" />
+                          )}
+                          <div>
+                            <p className="font-medium text-slate-900">{task.title}</p>
+                            <p className="text-sm text-slate-600">Due: {new Date(task.dueDate).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge className={getStatusColor(task.status)}>
+                            {task.status.replace('-', ' ')}
+                          </Badge>
+                          {task.status !== "completed" && (
+                            <Button variant="outline" size="sm">
+                              Update
+                            </Button>
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge className={getStatusColor(task.status)}>
-                          {task.status.replace('-', ' ')}
-                        </Badge>
-                        {task.status !== "completed" && (
-                          <Button variant="outline" size="sm">
-                            Update
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </>
             ) : (
               <Card>
                 <CardContent className="py-12 text-center">

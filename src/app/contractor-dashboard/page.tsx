@@ -44,10 +44,24 @@ export default function ContractorDashboardPage() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "ratings" | "chat" | "photos" | "payments" | "bidding">("dashboard");
   const [contractorName, setContractorName] = useState("Contractor");
 
+  const [contractorData, setContractorData] = useState({
+    totalEarnings: 0,
+    activeProjects: 0,
+    completedProjects: 0,
+    averageRating: 0,
+    tasksCompleted: 0,
+    pendingPayments: 0
+  });
+
+  const [projects, setProjects] = useState<any[]>([]);
+  const [currentUsername, setCurrentUsername] = useState("");
+
   useEffect(() => {
-    // Load contractor name from localStorage
+    // Load contractor name and data from localStorage
     const username = localStorage.getItem("contractor_username");
     if (username) {
+      setCurrentUsername(username);
+
       // Convert username to display name (e.g., "demo" -> "Demo Contractor")
       if (username === "demo") {
         setContractorName("Demo Contractor");
@@ -58,57 +72,233 @@ export default function ContractorDashboardPage() {
         ).join(" ");
         setContractorName(formatted);
       }
+
+      // Load contractor-specific data
+      loadContractorData(username);
     }
   }, []);
 
-  // Mock data - in real app this would come from API
-  const contractorData = {
-    totalEarnings: 85750,
-    activeProjects: 2,
-    completedProjects: 12,
-    averageRating: 4.8,
-    tasksCompleted: 146,
-    pendingPayments: 12500
+  const loadContractorData = (username: string) => {
+    // Get all contractor data from localStorage
+    const allContractorsData = localStorage.getItem("flipco_contractors_data");
+
+    if (allContractorsData) {
+      const contractorsData = JSON.parse(allContractorsData);
+      const userData = contractorsData[username];
+
+      if (userData) {
+        setContractorData(userData.stats);
+        setProjects(userData.projects || []);
+      } else {
+        // Initialize default data for this contractor
+        initializeContractorData(username);
+      }
+    } else {
+      // Initialize default data for this contractor
+      initializeContractorData(username);
+    }
   };
 
-  const projects = [
-    {
-      id: "project-1",
-      name: "Oakwood Renovation",
-      address: "123 Oakwood Dr, Austin, TX",
-      status: "In Progress",
-      progress: 75,
-      budget: 45000,
-      spent: 33750,
-      deadline: "2025-11-15",
-      priority: "High",
-      tasks: [
-        { id: 1, title: "Kitchen Cabinet Installation", status: "completed", dueDate: "2025-10-28" },
-        { id: 2, title: "Bathroom Tile Work", status: "in-progress", dueDate: "2025-11-05" },
-        { id: 3, title: "Hardwood Floor Installation", status: "pending", dueDate: "2025-11-12" },
-        { id: 4, title: "Final Paint Touch-ups", status: "pending", dueDate: "2025-11-14" }
-      ]
-    },
-    {
-      id: "project-2",
-      name: "Pine Street Fix & Flip",
-      address: "456 Pine St, Austin, TX",
-      status: "Planning",
-      progress: 25,
-      budget: 38000,
-      spent: 9500,
-      deadline: "2025-12-20",
-      priority: "Medium",
-      tasks: [
-        { id: 5, title: "Demolition Work", status: "completed", dueDate: "2025-10-20" },
-        { id: 6, title: "Electrical Rough-in", status: "in-progress", dueDate: "2025-11-03" },
-        { id: 7, title: "Plumbing Installation", status: "pending", dueDate: "2025-11-10" },
-        { id: 8, title: "Drywall Installation", status: "pending", dueDate: "2025-11-17" }
-      ]
-    }
-  ];
+  const initializeContractorData = (username: string) => {
+    // Create unique default data based on username
+    const defaultData = getDefaultDataForContractor(username);
 
-  const currentProject = projects.find(p => p.id === selectedProject) || projects[0];
+    // Get existing contractors data or create new object
+    const allContractorsData = localStorage.getItem("flipco_contractors_data");
+    const contractorsData = allContractorsData ? JSON.parse(allContractorsData) : {};
+
+    // Add this contractor's data
+    contractorsData[username] = defaultData;
+
+    // Save back to localStorage
+    localStorage.setItem("flipco_contractors_data", JSON.stringify(contractorsData));
+
+    // Set state
+    setContractorData(defaultData.stats);
+    setProjects(defaultData.projects);
+  };
+
+  const getDefaultDataForContractor = (username: string) => {
+    // Different default data for each contractor
+    const defaults: Record<string, any> = {
+      "demo": {
+        stats: {
+          totalEarnings: 85750,
+          activeProjects: 2,
+          completedProjects: 12,
+          averageRating: 4.8,
+          tasksCompleted: 146,
+          pendingPayments: 12500
+        },
+        projects: [
+          {
+            id: "project-demo-1",
+            name: "Oakwood Renovation",
+            address: "123 Oakwood Dr, Austin, TX",
+            status: "In Progress",
+            progress: 75,
+            budget: 45000,
+            spent: 33750,
+            deadline: "2025-11-15",
+            priority: "High",
+            tasks: [
+              { id: 1, title: "Kitchen Cabinet Installation", status: "completed", dueDate: "2025-10-28" },
+              { id: 2, title: "Bathroom Tile Work", status: "in-progress", dueDate: "2025-11-05" },
+              { id: 3, title: "Hardwood Floor Installation", status: "pending", dueDate: "2025-11-12" },
+              { id: 4, title: "Final Paint Touch-ups", status: "pending", dueDate: "2025-11-14" }
+            ]
+          },
+          {
+            id: "project-demo-2",
+            name: "Pine Street Fix & Flip",
+            address: "456 Pine St, Austin, TX",
+            status: "Planning",
+            progress: 25,
+            budget: 38000,
+            spent: 9500,
+            deadline: "2025-12-20",
+            priority: "Medium",
+            tasks: [
+              { id: 5, title: "Demolition Work", status: "completed", dueDate: "2025-10-20" },
+              { id: 6, title: "Electrical Rough-in", status: "in-progress", dueDate: "2025-11-03" },
+              { id: 7, title: "Plumbing Installation", status: "pending", dueDate: "2025-11-10" },
+              { id: 8, title: "Drywall Installation", status: "pending", dueDate: "2025-11-17" }
+            ]
+          }
+        ]
+      },
+      "ahmed_hassan": {
+        stats: {
+          totalEarnings: 124300,
+          activeProjects: 3,
+          completedProjects: 18,
+          averageRating: 4.9,
+          tasksCompleted: 203,
+          pendingPayments: 18200
+        },
+        projects: [
+          {
+            id: "project-ahmed-1",
+            name: "Maple Ridge Drive",
+            address: "789 Maple Ridge Dr, Houston, TX",
+            status: "In Progress",
+            progress: 60,
+            budget: 52500,
+            spent: 31500,
+            deadline: "2025-11-20",
+            priority: "High",
+            tasks: [
+              { id: 1, title: "Foundation Repairs", status: "completed", dueDate: "2025-10-15" },
+              { id: 2, title: "Roof Replacement", status: "in-progress", dueDate: "2025-11-08" },
+              { id: 3, title: "HVAC Installation", status: "pending", dueDate: "2025-11-18" }
+            ]
+          },
+          {
+            id: "project-ahmed-2",
+            name: "Cedar Lane Townhouse",
+            address: "321 Cedar Ln, Houston, TX",
+            status: "In Progress",
+            progress: 85,
+            budget: 38000,
+            spent: 32300,
+            deadline: "2025-11-10",
+            priority: "High",
+            tasks: [
+              { id: 4, title: "Interior Painting", status: "in-progress", dueDate: "2025-11-05" },
+              { id: 5, title: "Landscaping", status: "pending", dueDate: "2025-11-09" }
+            ]
+          }
+        ]
+      },
+      "john_martinez": {
+        stats: {
+          totalEarnings: 67200,
+          activeProjects: 1,
+          completedProjects: 8,
+          averageRating: 4.7,
+          tasksCompleted: 95,
+          pendingPayments: 8500
+        },
+        projects: [
+          {
+            id: "project-john-1",
+            name: "Elm Street Contemporary",
+            address: "555 Elm St, Dallas, TX",
+            status: "In Progress",
+            progress: 45,
+            budget: 41000,
+            spent: 18450,
+            deadline: "2025-12-05",
+            priority: "Medium",
+            tasks: [
+              { id: 1, title: "Kitchen Remodel", status: "in-progress", dueDate: "2025-11-15" },
+              { id: 2, title: "Master Bath Renovation", status: "pending", dueDate: "2025-11-25" },
+              { id: 3, title: "Flooring Installation", status: "pending", dueDate: "2025-12-01" }
+            ]
+          }
+        ]
+      },
+      "maria_rodriguez": {
+        stats: {
+          totalEarnings: 98500,
+          activeProjects: 2,
+          completedProjects: 15,
+          averageRating: 4.9,
+          tasksCompleted: 178,
+          pendingPayments: 14700
+        },
+        projects: [
+          {
+            id: "project-maria-1",
+            name: "Birch Avenue Duplex",
+            address: "890 Birch Ave, San Antonio, TX",
+            status: "In Progress",
+            progress: 70,
+            budget: 48000,
+            spent: 33600,
+            deadline: "2025-11-18",
+            priority: "High",
+            tasks: [
+              { id: 1, title: "Unit A Completion", status: "completed", dueDate: "2025-10-30" },
+              { id: 2, title: "Unit B Kitchen", status: "in-progress", dueDate: "2025-11-10" },
+              { id: 3, title: "Exterior Paint", status: "pending", dueDate: "2025-11-16" }
+            ]
+          },
+          {
+            id: "project-maria-2",
+            name: "Willow Creek Ranch",
+            address: "1200 Willow Creek Rd, San Antonio, TX",
+            status: "Planning",
+            progress: 30,
+            budget: 62000,
+            spent: 18600,
+            deadline: "2025-12-30",
+            priority: "Medium",
+            tasks: [
+              { id: 4, title: "Site Prep", status: "completed", dueDate: "2025-10-25" },
+              { id: 5, title: "Foundation Work", status: "in-progress", dueDate: "2025-11-12" },
+              { id: 6, title: "Framing", status: "pending", dueDate: "2025-11-20" }
+            ]
+          }
+        ]
+      }
+    };
+
+    // Return specific contractor data or generic default
+    return defaults[username] || {
+      stats: {
+        totalEarnings: 0,
+        activeProjects: 0,
+        completedProjects: 0,
+        averageRating: 5.0,
+        tasksCompleted: 0,
+        pendingPayments: 0
+      },
+      projects: []
+    };
+  };
+
+  const currentProject = projects.find(p => p.id === selectedProject) || projects[0] || null;
 
   const getStatusColor = (status: string) => {
     switch (status) {

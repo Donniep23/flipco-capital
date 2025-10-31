@@ -86,6 +86,13 @@ export default function AdminDashboard() {
       action: "contractor-approval"
     },
     {
+      title: "Contractor Assignments",
+      description: "Assign projects to contractors and manage their dashboards",
+      icon: Users,
+      color: "bg-teal-600",
+      action: "contractor-assignments"
+    },
+    {
       title: "Investor Portal",
       description: "Configure investor portal and registration settings",
       icon: DollarSign,

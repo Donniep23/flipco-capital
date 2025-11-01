@@ -62,13 +62,39 @@ export default function InvestmentOpportunitiesEditor() {
     }
     setIsAuthenticated(true);
 
-    // Load opportunities from localStorage or use defaults
-    const savedOpportunities = localStorage.getItem("flipco_investment_opportunities");
-    if (savedOpportunities) {
-      setOpportunities(JSON.parse(savedOpportunities));
-    } else {
-      // Default opportunities
-      const defaultOpportunities: InvestmentOpportunity[] = [
+    // Load opportunities from Supabase API
+    loadOpportunities();
+  }, [router]);
+
+  const loadOpportunities = async () => {
+    try {
+      const response = await fetch('/api/investment-opportunities');
+      const result = await response.json();
+
+      if (result.success && result.data && result.data.length > 0) {
+        // Convert from database format to component format
+        const formatted = result.data.map((item: any) => ({
+          id: item.opportunity_id,
+          name: item.name,
+          address: item.address,
+          beds: item.beds,
+          baths: item.baths,
+          sqft: item.sqft,
+          status: item.status,
+          statusColor: item.status_color,
+          roi: item.roi,
+          projectedProfit: item.projected_profit,
+          purchasePrice: item.purchase_price,
+          renovationBudget: item.renovation_budget,
+          estimatedARV: item.estimated_arv,
+          timeline: item.timeline,
+          image: item.image,
+          investmentTiers: item.investment_tiers
+        }));
+        setOpportunities(formatted);
+      } else {
+        // Use defaults if database is empty
+        const defaultOpportunities: InvestmentOpportunity[] = [
         {
           id: "maple-ridge",
           name: "Maple Ridge Drive",
@@ -114,30 +140,65 @@ export default function InvestmentOpportunitiesEditor() {
           }
         }
       ];
-      setOpportunities(defaultOpportunities);
+        setOpportunities(defaultOpportunities);
+      }
+    } catch (error) {
+      console.error('Error loading opportunities:', error);
     }
-  }, [router]);
+  };
 
   const handleSaveOpportunity = async (opportunity: InvestmentOpportunity) => {
     setIsSaving(true);
     setSaveMessage("");
 
-    // Update opportunities array
-    const updatedOpportunities = opportunities.map(o =>
-      o.id === opportunity.id ? opportunity : o
-    );
-    setOpportunities(updatedOpportunities);
+    try {
+      // Save to Supabase
+      const response = await fetch('/api/investment-opportunities', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: opportunity.id,
+          opportunity_id: opportunity.id,
+          name: opportunity.name,
+          address: opportunity.address,
+          beds: opportunity.beds,
+          baths: opportunity.baths,
+          sqft: opportunity.sqft,
+          status: opportunity.status,
+          status_color: opportunity.statusColor,
+          roi: opportunity.roi,
+          projected_profit: opportunity.projectedProfit,
+          purchase_price: opportunity.purchasePrice,
+          renovation_budget: opportunity.renovationBudget,
+          estimated_arv: opportunity.estimatedARV,
+          timeline: opportunity.timeline,
+          image: opportunity.image,
+          investment_tiers: opportunity.investmentTiers
+        })
+      });
 
-    // Save to localStorage
-    localStorage.setItem("flipco_investment_opportunities", JSON.stringify(updatedOpportunities));
+      const result = await response.json();
 
-    setSaveMessage(`✅ ${opportunity.name} saved successfully!`);
+      if (result.success) {
+        // Update local state
+        const updatedOpportunities = opportunities.map(o =>
+          o.id === opportunity.id ? opportunity : o
+        );
+        setOpportunities(updatedOpportunities);
+
+        setSaveMessage(`✅ ${opportunity.name} saved successfully!`);
+      } else {
+        setSaveMessage(`❌ Error: ${result.error}`);
+      }
+    } catch (error: any) {
+      setSaveMessage(`❌ Error saving: ${error.message}`);
+    }
+
     setIsSaving(false);
-
     setTimeout(() => setSaveMessage(""), 3000);
   };
 
-  const handleAddNewOpportunity = () => {
+  const handleAddNewOpportunity = async () => {
     const newOpportunity: InvestmentOpportunity = {
       id: `opportunity-${Date.now()}`,
       name: "New Property",
@@ -161,20 +222,64 @@ export default function InvestmentOpportunitiesEditor() {
       }
     };
 
-    const updatedOpportunities = [...opportunities, newOpportunity];
-    setOpportunities(updatedOpportunities);
-    localStorage.setItem("flipco_investment_opportunities", JSON.stringify(updatedOpportunities));
-    setSelectedOpportunity(newOpportunity);
+    try {
+      // Add to Supabase
+      const response = await fetch('/api/investment-opportunities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          opportunity_id: newOpportunity.id,
+          name: newOpportunity.name,
+          address: newOpportunity.address,
+          beds: newOpportunity.beds,
+          baths: newOpportunity.baths,
+          sqft: newOpportunity.sqft,
+          status: newOpportunity.status,
+          status_color: newOpportunity.statusColor,
+          roi: newOpportunity.roi,
+          projected_profit: newOpportunity.projectedProfit,
+          purchase_price: newOpportunity.purchasePrice,
+          renovation_budget: newOpportunity.renovationBudget,
+          estimated_arv: newOpportunity.estimatedARV,
+          timeline: newOpportunity.timeline,
+          image: newOpportunity.image,
+          investment_tiers: newOpportunity.investmentTiers
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const updatedOpportunities = [...opportunities, newOpportunity];
+        setOpportunities(updatedOpportunities);
+        setSelectedOpportunity(newOpportunity);
+      }
+    } catch (error) {
+      console.error('Error adding opportunity:', error);
+    }
   };
 
-  const handleDeleteOpportunity = (id: string) => {
+  const handleDeleteOpportunity = async (id: string) => {
     if (confirm("Are you sure you want to delete this investment opportunity?")) {
-      const updatedOpportunities = opportunities.filter(o => o.id !== id);
-      setOpportunities(updatedOpportunities);
-      localStorage.setItem("flipco_investment_opportunities", JSON.stringify(updatedOpportunities));
-      setSelectedOpportunity(null);
-      setSaveMessage("✅ Opportunity deleted successfully!");
-      setTimeout(() => setSaveMessage(""), 3000);
+      try {
+        const response = await fetch(`/api/investment-opportunities?id=${id}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          const updatedOpportunities = opportunities.filter(o => o.id !== id);
+          setOpportunities(updatedOpportunities);
+          setSelectedOpportunity(null);
+          setSaveMessage("✅ Opportunity deleted successfully!");
+          setTimeout(() => setSaveMessage(""), 3000);
+        }
+      } catch (error) {
+        console.error('Error deleting opportunity:', error);
+        setSaveMessage("❌ Error deleting opportunity");
+        setTimeout(() => setSaveMessage(""), 3000);
+      }
     }
   };
 

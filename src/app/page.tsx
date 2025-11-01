@@ -60,14 +60,37 @@ export default function HomePage() {
   const [showDemoVideo, setShowDemoVideo] = useState(false);
   const [opportunities, setOpportunities] = useState<InvestmentOpportunity[]>([]);
 
-  // Load investment opportunities from admin panel
+  // Load investment opportunities from Supabase
   useEffect(() => {
-    const savedOpportunities = localStorage.getItem("flipco_investment_opportunities");
-    if (savedOpportunities) {
-      setOpportunities(JSON.parse(savedOpportunities));
-    } else {
-      // Default opportunities if none saved - save them to localStorage so they appear in projects page
-      const defaultOpportunities = [
+    loadOpportunities();
+  }, []);
+
+  const loadOpportunities = async () => {
+    try {
+      const response = await fetch('/api/investment-opportunities');
+      const result = await response.json();
+
+      if (result.success && result.data && result.data.length > 0) {
+        // Convert from database format
+        const formatted = result.data.map((item: any) => ({
+          id: item.opportunity_id,
+          name: item.name,
+          address: item.address,
+          status: item.status,
+          statusColor: item.status_color,
+          roi: item.roi,
+          projectedProfit: item.projected_profit,
+          purchasePrice: item.purchase_price,
+          renovationBudget: item.renovation_budget,
+          estimatedARV: item.estimated_arv,
+          timeline: item.timeline,
+          image: item.image,
+          investmentTiers: item.investment_tiers
+        }));
+        setOpportunities(formatted);
+      } else {
+        // Use defaults if database is empty
+        const defaultOpportunities = [
         {
           id: "maple-ridge",
           name: "Maple Ridge Drive",
@@ -99,12 +122,12 @@ export default function HomePage() {
           investmentTiers: { bronze: 25, silver: 27, gold: 29 }
         }
       ];
-
-      // Save defaults to localStorage so they sync to projects page
-      localStorage.setItem("flipco_investment_opportunities", JSON.stringify(defaultOpportunities));
-      setOpportunities(defaultOpportunities);
+        setOpportunities(defaultOpportunities);
+      }
+    } catch (error) {
+      console.error('Error loading opportunities:', error);
     }
-  }, []);
+  };
 
   const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -948,7 +971,7 @@ export default function HomePage() {
 
         {/* PWA Install Prompt */}
         <PWAInstaller />
-        
+
         {/* Manual Install Button for Firefox and other browsers */}
         <InstallAppButton />
       </div>

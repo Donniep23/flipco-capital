@@ -21,7 +21,15 @@ export default function SiteSettingsEditor() {
     total_investment_volume: 300,
     happy_investors: 30,
     company_phone: "(713) 545-3662",
-    company_email: "invest@flipcocapital.com"
+    company_email: "invest@flipcocapital.com",
+    hero_title: "Real Estate Investment",
+    hero_subtitle: "Made Transparent",
+    hero_description: "Partner with Flipco Capital for complete transparency in fix-and-flip investments.",
+    cta_button_primary: "Start Investing",
+    cta_button_secondary: "Watch Demo",
+    section_opportunities_title: "Current Investment Opportunities",
+    projects_page_title: "Our Projects",
+    minimum_investment: "$50,000"
   });
 
   useEffect(() => {
@@ -182,7 +190,35 @@ export default function SiteSettingsEditor() {
               </div>
             </div>
 
-            <Button onClick={handleSave} disabled={isSaving} className="w-full bg-blue-600 hover:bg-blue-700" size="lg">
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Homepage Text</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="hero_title">Hero Title</Label>
+                  <Input id="hero_title" value={settings.hero_title} onChange={(e) => setSettings({ ...settings, hero_title: e.target.value })} />
+                </div>
+                <div>
+                  <Label htmlFor="hero_subtitle">Hero Subtitle</Label>
+                  <Input id="hero_subtitle" value={settings.hero_subtitle} onChange={(e) => setSettings({ ...settings, hero_subtitle: e.target.value })} />
+                </div>
+                <div>
+                  <Label htmlFor="section_opportunities_title">Investment Opportunities Section Title</Label>
+                  <Input id="section_opportunities_title" value={settings.section_opportunities_title} onChange={(e) => setSettings({ ...settings, section_opportunities_title: e.target.value })} />
+                </div>
+                <div>
+                  <Label htmlFor="projects_page_title">Projects Page Title</Label>
+                  <Input id="projects_page_title" value={settings.projects_page_title} onChange={(e) => setSettings({ ...settings, projects_page_title: e.target.value })} />
+                </div>
+                <div>
+                  <Label htmlFor="minimum_investment">Minimum Investment</Label>
+                  <Input id="minimum_investment" value={settings.minimum_investment} onChange={(e) => setSettings({ ...settings, minimum_investment: e.target.value })} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Button onClick={handleSave} disabled={isSaving} className="w-full mt-6 bg-blue-600 hover:bg-blue-700" size="lg">
               <Save className="h-4 w-4 mr-2" />
               {isSaving ? "Saving..." : "Save All Settings"}
             </Button>

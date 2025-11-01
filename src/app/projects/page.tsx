@@ -54,6 +54,22 @@ export default function ProjectsPage() {
   const [showBeforeGallery, setShowBeforeGallery] = useState<string | null>(null);
   const [showAfterGallery, setShowAfterGallery] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [settings, setSettings] = useState({ total_properties: 1500, average_roi: 30 });
+
+  // Load site settings
+  useEffect(() => {
+    fetch('/api/site-settings')
+      .then(res => res.json())
+      .then(result => {
+        if (result.success && result.data) {
+          setSettings({
+            total_properties: result.data.total_properties || 1500,
+            average_roi: result.data.average_roi || 30
+          });
+        }
+      })
+      .catch(err => console.error('Error loading settings:', err));
+  }, []);
 
   // Load projects including investment opportunities from homepage
   useEffect(() => {
@@ -377,13 +393,13 @@ export default function ProjectsPage() {
         <div className="grid md:grid-cols-4 gap-6 mb-12">
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-3xl font-bold text-blue-600">75+</CardTitle>
+              <CardTitle className="text-3xl font-bold text-blue-600">{settings.total_properties}+</CardTitle>
               <CardDescription>Total Projects</CardDescription>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-3xl font-bold text-green-600">31%</CardTitle>
+              <CardTitle className="text-3xl font-bold text-green-600">{settings.average_roi}%</CardTitle>
               <CardDescription>Average ROI</CardDescription>
             </CardHeader>
           </Card>

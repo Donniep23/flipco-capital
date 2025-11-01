@@ -58,6 +58,13 @@ export default function AdminDashboard() {
 
   const quickActions = [
     {
+      title: "Site Settings",
+      description: "Edit global text and numbers (properties flipped, ROI%, etc.)",
+      icon: Settings,
+      color: "bg-purple-600",
+      action: "site-settings"
+    },
+    {
       title: "Edit Homepage",
       description: "Update hero section, taglines, and featured content",
       icon: Home,

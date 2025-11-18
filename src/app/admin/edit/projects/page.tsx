@@ -527,27 +527,23 @@ export default function ProjectsEditor() {
                     <CardContent className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                          <Label htmlFor="beforeImage">Main Before Image</Label>
-                          <Input
-                            id="beforeImage"
-                            value={selectedProject.beforeImage}
-                            onChange={(e) => setSelectedProject({
+                          <ImageUploader
+                            label="Main Before Image"
+                            currentImage={selectedProject.beforeImage}
+                            onImageUpload={(base64) => setSelectedProject({
                               ...selectedProject,
-                              beforeImage: e.target.value
+                              beforeImage: base64
                             })}
-                            placeholder="Image URL or path"
                           />
                         </div>
                         <div>
-                          <Label htmlFor="afterImage">Main After Image</Label>
-                          <Input
-                            id="afterImage"
-                            value={selectedProject.afterImage}
-                            onChange={(e) => setSelectedProject({
+                          <ImageUploader
+                            label="Main After Image"
+                            currentImage={selectedProject.afterImage}
+                            onImageUpload={(base64) => setSelectedProject({
                               ...selectedProject,
-                              afterImage: e.target.value
+                              afterImage: base64
                             })}
-                            placeholder="Image URL or path"
                           />
                         </div>
                       </div>

@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
 import ImageUploader from "@/components/ImageUploader";
 import {
   ArrowLeft,
@@ -24,7 +25,8 @@ import {
   Calendar,
   DollarSign,
   MapPin,
-  Building2
+  Building2,
+  X
 } from "lucide-react";
 
 interface Project {
@@ -548,33 +550,129 @@ export default function ProjectsEditor() {
                         </div>
                       </div>
 
+                      {/* Before Images Gallery */}
                       <div>
-                        <Label>Before Images Gallery ({selectedProject.beforeImages?.length || 0} photos)</Label>
-                        <div className="mt-2 p-4 border rounded-lg bg-slate-50">
-                          <p className="text-sm text-slate-600 mb-2">
-                            Current gallery: {selectedProject.beforeImages?.length || 0} before photos
-                            {selectedProject.afterImages && ` + ${selectedProject.afterImages.length} after photos`}
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline">
-                              {selectedProject.beforeImages?.length || 0} Before Photos
-                            </Badge>
-                            {selectedProject.afterImages && (
-                              <Badge variant="outline">
-                                {selectedProject.afterImages.length} After Photos
-                              </Badge>
-                            )}
-                          </div>
+                        <div className="flex items-center justify-between mb-4">
+                          <Label className="text-lg font-semibold">Before Images Gallery ({selectedProject.beforeImages?.length || 0} photos)</Label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const updated = { ...selectedProject };
+                              if (!updated.beforeImages) updated.beforeImages = [];
+                              updated.beforeImages.push("");
+                              setSelectedProject(updated);
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Before Photo
+                          </Button>
+                        </div>
+
+                        <div className="space-y-4">
+                          {selectedProject.beforeImages?.map((image, index) => (
+                            <div key={index} className="flex gap-4 items-start">
+                              <div className="flex-1">
+                                <ImageUploader
+                                  label={`Before Photo ${index + 1}`}
+                                  currentImage={image}
+                                  onImageUpload={(base64) => {
+                                    const updated = { ...selectedProject };
+                                    if (updated.beforeImages) {
+                                      updated.beforeImages[index] = base64;
+                                      setSelectedProject(updated);
+                                    }
+                                  }}
+                                />
+                              </div>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  const updated = { ...selectedProject };
+                                  if (updated.beforeImages) {
+                                    updated.beforeImages = updated.beforeImages.filter((_, i) => i !== index);
+                                    setSelectedProject(updated);
+                                  }
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+
+                          {(!selectedProject.beforeImages || selectedProject.beforeImages.length === 0) && (
+                            <p className="text-sm text-slate-500 text-center py-8 border rounded-lg bg-slate-50">
+                              No before photos yet. Click "Add Before Photo" to start adding photos.
+                            </p>
+                          )}
                         </div>
                       </div>
 
-                      <Alert>
-                        <Image className="h-4 w-4" />
-                        <AlertDescription>
-                          Photo galleries are configured based on the folder structure in `/public/projects/[project-folder]/`.
-                          Upload your photos to the appropriate folder and they will automatically appear in the gallery.
-                        </AlertDescription>
-                      </Alert>
+                      <Separator />
+
+                      {/* After Images Gallery */}
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <Label className="text-lg font-semibold">After Images Gallery ({selectedProject.afterImages?.length || 0} photos)</Label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const updated = { ...selectedProject };
+                              if (!updated.afterImages) updated.afterImages = [];
+                              updated.afterImages.push("");
+                              setSelectedProject(updated);
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add After Photo
+                          </Button>
+                        </div>
+
+                        <div className="space-y-4">
+                          {selectedProject.afterImages?.map((image, index) => (
+                            <div key={index} className="flex gap-4 items-start">
+                              <div className="flex-1">
+                                <ImageUploader
+                                  label={`After Photo ${index + 1}`}
+                                  currentImage={image}
+                                  onImageUpload={(base64) => {
+                                    const updated = { ...selectedProject };
+                                    if (updated.afterImages) {
+                                      updated.afterImages[index] = base64;
+                                      setSelectedProject(updated);
+                                    }
+                                  }}
+                                />
+                              </div>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  const updated = { ...selectedProject };
+                                  if (updated.afterImages) {
+                                    updated.afterImages = updated.afterImages.filter((_, i) => i !== index);
+                                    setSelectedProject(updated);
+                                  }
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+
+                          {(!selectedProject.afterImages || selectedProject.afterImages.length === 0) && (
+                            <p className="text-sm text-slate-500 text-center py-8 border rounded-lg bg-slate-50">
+                              No after photos yet. Click "Add After Photo" to start adding photos.
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 </TabsContent>

@@ -34,6 +34,8 @@ interface TeamMember {
 
 export default function TeamMembersEditor() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [isSaving, setIsSaving] = useState(false);
@@ -42,21 +44,29 @@ export default function TeamMembersEditor() {
   const router = useRouter();
 
   const loadTeamMembers = async () => {
+    setIsLoading(true);
+    setLoadError("");
+
     try {
       const response = await fetch('/api/team-members');
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`);
+      }
+
       const result = await response.json();
 
       if (result.success && result.data && result.data.length > 0) {
         // Convert from database format
         const formatted = result.data.map((item: any) => ({
-          name: item.name,
-          title: item.title,
-          image: item.image,
-          bio: item.bio,
-          experience: item.experience,
-          specialties: item.specialties,
-          linkedin: item.linkedin,
-          email: item.email
+          name: item.name || "",
+          title: item.title || "",
+          image: item.image || "",
+          bio: item.bio || "",
+          experience: item.experience || "",
+          specialties: Array.isArray(item.specialties) ? item.specialties : [],
+          linkedin: item.linkedin || "#",
+          email: item.email || ""
         }));
         setTeamMembers(formatted);
       } else {
@@ -145,8 +155,25 @@ export default function TeamMembersEditor() {
       ];
       setTeamMembers(defaultTeam);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading team members:', error);
+      setLoadError(`Failed to load team members: ${error.message}`);
+      // Set defaults on error
+      const defaultTeam: TeamMember[] = [
+        {
+          name: "Cameron Namazi",
+          title: "Founder & CEO",
+          image: "https://ugc.same-assets.com/RgFq8d8gduOl8nY0rxg9BoWmrYpunj35.jpeg",
+          bio: "23+ years in real estate investment and development.",
+          experience: "23+ Years",
+          specialties: ["Property Acquisition", "Investment Strategy", "Portfolio Management"],
+          linkedin: "#",
+          email: "cameron@flipcocapital.com"
+        }
+      ];
+      setTeamMembers(defaultTeam);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -244,8 +271,23 @@ export default function TeamMembersEditor() {
     </div>;
   }
 
+  if (isLoading) {
+    return <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+      <p>Loading team members...</p>
+    </div>;
+  }
+
+  if (teamMembers.length === 0) {
+    return <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+      <div className="text-center">
+        <p className="text-red-600 mb-4">{loadError || "No team members found"}</p>
+        <Button onClick={() => loadTeamMembers()}>Retry</Button>
+      </div>
+    </div>;
+  }
+
   const currentMember = teamMembers[selectedIndex];
-  const filled = isSlotFilled(currentMember);
+  const filled = currentMember ? isSlotFilled(currentMember) : false;
 
   return (
     <div className="min-h-screen bg-slate-50">

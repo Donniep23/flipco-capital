@@ -41,19 +41,6 @@ export default function TeamMembersEditor() {
   const [newSpecialty, setNewSpecialty] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    // Check authentication
-    const session = localStorage.getItem("flipco_admin_session");
-    if (session !== "authenticated") {
-      router.push("/admin");
-      return;
-    }
-    setIsAuthenticated(true);
-
-    // Load team members from Supabase
-    loadTeamMembers();
-  }, [router]);
-
   const loadTeamMembers = async () => {
     try {
       const response = await fetch('/api/team-members');
@@ -162,6 +149,20 @@ export default function TeamMembersEditor() {
       console.error('Error loading team members:', error);
     }
   };
+
+  useEffect(() => {
+    // Check authentication
+    const session = localStorage.getItem("flipco_admin_session");
+    if (session !== "authenticated") {
+      router.push("/admin");
+      return;
+    }
+    setIsAuthenticated(true);
+
+    // Load team members from Supabase
+    loadTeamMembers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   const handleSave = async () => {
     setIsSaving(true);

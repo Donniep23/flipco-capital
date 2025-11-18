@@ -157,6 +157,7 @@ export default function TeamMembersEditor() {
         }
       ];
       setTeamMembers(defaultTeam);
+      }
     } catch (error) {
       console.error('Error loading team members:', error);
     }

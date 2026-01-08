@@ -1,0 +1,33 @@
+<svg width="180" height="120" viewBox="0 0 180 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- House outline with arrow centered -->
+  <g transform="translate(40, 10)">
+    <!-- House roof - triangular -->
+    <path d="M15 35 L40 15 L65 35 Z" fill="#2563eb" stroke="#2563eb" stroke-width="3"/>
+
+    <!-- House walls - rectangular -->
+    <rect x="18" y="35" width="44" height="30" fill="none" stroke="#2563eb" stroke-width="4"/>
+
+    <!-- House foundation/base -->
+    <rect x="12" y="65" width="56" height="5" fill="#2563eb"/>
+
+    <!-- Windows in 2x2 grid -->
+    <rect x="28" y="42" width="8" height="8" fill="#2563eb"/>
+    <rect x="44" y="42" width="8" height="8" fill="#2563eb"/>
+    <rect x="28" y="52" width="8" height="8" fill="#2563eb"/>
+    <rect x="44" y="52" width="8" height="8" fill="#2563eb"/>
+
+    <!-- Trending up arrow icon style (like TrendingUp from Lucide) -->
+    <g transform="translate(50, 25)">
+      <!-- Arrow line going up -->
+      <path d="M-15 20 L-5 10 L5 0 L15 -10" stroke="#2563eb" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Arrow head -->
+      <path d="M8 -10 L15 -10 L15 -3" stroke="#2563eb" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- FLIPCO text - centered below house -->
+  <text x="90" y="90" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#2563eb" text-anchor="middle">FLIPCO</text>
+
+  <!-- CAPITAL text - positioned below FLIPCO -->
+  <text x="90" y="110" font-family="Arial, sans-serif" font-size="14" font-weight="normal" fill="#2563eb" letter-spacing="3px" text-anchor="middle">CAPITAL</text>
+</svg>

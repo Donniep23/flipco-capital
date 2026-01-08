@@ -107,6 +107,13 @@ export default function AdminDashboard() {
       action: "contractor-assignments"
     },
     {
+      title: "Investor Approvals",
+      description: "Review and approve investor applications",
+      icon: Shield,
+      color: "bg-amber-600",
+      action: "investor-approvals"
+    },
+    {
       title: "Investor Portal",
       description: "Configure investor portal and registration settings",
       icon: DollarSign,

@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +46,7 @@ export default function RegisterPage() {
         return;
       }
 
-      // Send notification to admin
+      // Send notification to admin and save to database
       const response = await fetch("/api/notify-admin", {
         method: "POST",
         headers: {
@@ -60,16 +61,14 @@ export default function RegisterPage() {
       const result = await response.json();
 
       if (result.success) {
+        setIsSubmitted(true);
         setSubmitMessage(
-          "🎉 Registration successful! We'll review your application and contact you within 24 hours. Check your email for a confirmation."
+          "Your application has been submitted successfully! Our team will review your application and contact you within 24-48 hours."
         );
         // Reset form
         (e.target as HTMLFormElement).reset();
 
-        // Redirect to thank you page after 3 seconds
-        setTimeout(() => {
-          window.location.href = "/dashboard";
-        }, 3000);
+        // DO NOT redirect to dashboard - user must wait for approval
       } else {
         setSubmitMessage(
           "There was an error processing your registration. Please try again or contact us directly at invest@flipcocapital.com"
@@ -84,6 +83,64 @@ export default function RegisterPage() {
       setIsLoading(false);
     }
   };
+
+  // Show success state after submission
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center p-4">
+        <div className="w-full max-w-lg">
+          <Card className="shadow-lg border-0">
+            <CardHeader className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <CardTitle className="text-2xl font-bold text-green-700">Application Submitted!</CardTitle>
+              <CardDescription className="text-base mt-2">
+                Thank you for your interest in Flipco Capital
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-semibold text-blue-900 mb-2">What happens next?</h3>
+                <ul className="text-sm text-blue-800 text-left space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">1</span>
+                    <span>Our team will review your application within 24-48 hours</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">2</span>
+                    <span>You'll receive an email once your account is approved</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">3</span>
+                    <span>After approval, you can login and access your investor dashboard</span>
+                  </li>
+                </ul>
+              </div>
+
+              <p className="text-slate-600 text-sm">
+                Check your email for a confirmation. If you have any questions, contact us at{" "}
+                <a href="mailto:invest@flipcocapital.com" className="text-blue-600 hover:underline">
+                  invest@flipcocapital.com
+                </a>
+              </p>
+
+              <div className="pt-4">
+                <Link href="/">
+                  <Button variant="outline" className="w-full">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Return to Home
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center p-4">
@@ -106,13 +163,21 @@ export default function RegisterPage() {
 
         <Card className="shadow-lg border-0">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">Apply to Invest</CardTitle>
             <CardDescription className="text-center">
-              Join Flipco Capital's exclusive investor network
+              Submit your application to join Flipco Capital's exclusive investor network
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Notice about approval process */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+              <p className="text-amber-800 text-sm">
+                <strong>Note:</strong> All investor applications require approval. You'll receive an email once your account is approved (typically within 24-48 hours).
+              </p>
+            </div>
+
             <form onSubmit={handleRegister} className="space-y-4">
+              {/* ... existing form fields ... */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">First Name</Label>
@@ -276,13 +341,13 @@ export default function RegisterPage() {
                 className="w-full bg-blue-600 hover:bg-blue-700"
                 disabled={isLoading}
               >
-                {isLoading ? "Creating Account..." : "Create Account"}
+                {isLoading ? "Submitting Application..." : "Submit Application"}
               </Button>
             </form>
 
-            {submitMessage && (
-              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-                <p className="text-blue-800">{submitMessage}</p>
+            {submitMessage && !isSubmitted && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-red-800">{submitMessage}</p>
               </div>
             )}
 
@@ -290,7 +355,7 @@ export default function RegisterPage() {
               <Separator className="my-4" />
               <div className="text-center">
                 <p className="text-sm text-slate-600">
-                  Already have an account?{" "}
+                  Already have an approved account?{" "}
                   <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
                     Sign in here
                   </Link>
@@ -303,7 +368,7 @@ export default function RegisterPage() {
         {/* Security Notice */}
         <div className="mt-6 text-center">
           <p className="text-xs text-slate-500">
-            🔒 All information is encrypted and secure. We will review your application within 24 hours.
+            All applications are reviewed by our team. You will receive an email notification once approved.
           </p>
         </div>
       </div>

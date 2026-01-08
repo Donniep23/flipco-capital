@@ -7,22 +7,68 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, ArrowLeft, Eye, EyeOff, AlertCircle, Clock, XCircle } from "lucide-react";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [errorType, setErrorType] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
+    setErrorType("");
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/investor-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Store investor session
+        localStorage.setItem("flipco_investor_session", JSON.stringify(result.investor));
+        // Redirect to dashboard
+        window.location.href = "/dashboard";
+      } else {
+        setError(result.error);
+        setErrorType(result.status || "error");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+      setErrorType("error");
+    } finally {
       setIsLoading(false);
-      // Redirect to dashboard
-      window.location.href = "/dashboard";
-    }, 1500);
+    }
+  };
+
+  const getErrorIcon = () => {
+    switch (errorType) {
+      case "pending":
+        return <Clock className="h-5 w-5 text-amber-600" />;
+      case "rejected":
+        return <XCircle className="h-5 w-5 text-red-600" />;
+      default:
+        return <AlertCircle className="h-5 w-5 text-red-600" />;
+    }
+  };
+
+  const getErrorStyles = () => {
+    switch (errorType) {
+      case "pending":
+        return "bg-amber-50 border-amber-200 text-amber-800";
+      case "rejected":
+        return "bg-red-50 border-red-200 text-red-800";
+      default:
+        return "bg-red-50 border-red-200 text-red-800";
+    }
   };
 
   return (
@@ -46,9 +92,9 @@ export default function LoginPage() {
 
         <Card className="shadow-lg border-0">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">Investor Sign In</CardTitle>
             <CardDescription className="text-center">
-              Enter your credentials to access your investor dashboard
+              Enter your credentials to access your dashboard
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -62,6 +108,8 @@ export default function LoginPage() {
                     type="email"
                     placeholder="investor@example.com"
                     className="pl-10"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -76,6 +124,8 @@ export default function LoginPage() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     className="pl-10 pr-10"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                   <button
@@ -87,6 +137,25 @@ export default function LoginPage() {
                   </button>
                 </div>
               </div>
+
+              {error && (
+                <div className={`p-4 border rounded-lg flex items-start gap-3 ${getErrorStyles()}`}>
+                  {getErrorIcon()}
+                  <div>
+                    <p className="font-medium">{error}</p>
+                    {errorType === "pending" && (
+                      <p className="text-sm mt-1 opacity-80">
+                        We're reviewing your application. This usually takes 24-48 hours.
+                      </p>
+                    )}
+                    {errorType === "rejected" && (
+                      <p className="text-sm mt-1 opacity-80">
+                        Contact us at invest@flipcocapital.com for more information.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center space-x-2 text-sm">
@@ -113,7 +182,7 @@ export default function LoginPage() {
                 <p className="text-sm text-slate-600">
                   Don't have an account?{" "}
                   <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
-                    Sign up here
+                    Apply to invest
                   </Link>
                 </p>
                 <p className="text-xs text-slate-500">
@@ -127,10 +196,18 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
+        {/* Info Notice */}
+        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-sm text-blue-800">
+            <strong>Note:</strong> Only approved investors can access the dashboard.
+            If you recently applied, please wait for approval notification via email.
+          </p>
+        </div>
+
         {/* Security Notice */}
-        <div className="mt-6 text-center">
+        <div className="mt-4 text-center">
           <p className="text-xs text-slate-500">
-            🔒 Your connection is secured with 256-bit SSL encryption
+            Your connection is secured with 256-bit SSL encryption
           </p>
         </div>
       </div>

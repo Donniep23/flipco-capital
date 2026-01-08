@@ -27,9 +27,16 @@
   - [x] Created editable project template with sensible defaults
   - [x] Investment opportunities show under "From Opportunities" section
   - [x] Projects sync to database with localStorage fallback
+- [x] **Investor Approval Workflow (Version 19)**:
+  - [x] Registration no longer auto-redirects to dashboard
+  - [x] Investors saved to database with "pending" status
+  - [x] Login checks approval status before allowing access
+  - [x] New Investor Approvals admin page to approve/reject applications
+  - [x] Email notifications sent on approval/rejection
+  - [x] Clear messaging for pending/rejected users at login
 
 ## Current Version
-- **Version 17**: Project Add/Delete Features Complete
+- **Version 19**: Investor Approval Workflow
 - **Live URL:** https://same-zbf9n8rlt2m-latest.netlify.app
 - **Admin Portal:** https://same-zbf9n8rlt2m-latest.netlify.app/admin
 
@@ -40,6 +47,13 @@
 - `/admin/edit/investment-opportunities` - Investment Opportunities Manager
 - `/admin/edit/site-settings` - Global Site Settings
 - `/admin/edit/faq` - FAQ Editor
+- `/admin/edit/investor-approvals` - **NEW** Approve/reject investor applications
+
+## Investor Workflow
+1. User registers at `/register` - application submitted
+2. Admin reviews at `/admin/edit/investor-approvals`
+3. Admin approves or rejects (email sent automatically)
+4. Only approved investors can login at `/login`
 
 ## Database Tables (Supabase)
 - `investment_opportunities` - Investment opportunity listings
@@ -48,9 +62,10 @@
 - `faq_items` - FAQ content
 - `contact_submissions` - Contact form entries
 - `contractor_approvals` - Contractor applications
-- `investor_users` - Investor registrations
+- `investor_users` - Investor registrations (with status: pending/approved/rejected)
 
 ## Notes
 - All changes are now visible on any device/browser via the Netlify deployment
 - The site uses Supabase for data storage, so changes made in the admin portal will sync across all devices
 - Run `ADD-ALL-MISSING-TABLES.sql` in Supabase SQL Editor if any tables are missing
+- Run `ADD-INVESTOR-APPROVAL-COLUMN.sql` to add password_hash column for investor login
